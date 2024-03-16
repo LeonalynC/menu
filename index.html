@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen Menu</title>
+    <style>
+        body, h1, p, ul, li, select, input[type="number"], .payment-info input[type="number"], .payment-info .pay-button {
+            font-family: Georgia, serif;
+        }
+
+        body {
+            background-image: url('p.gif'); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-color: #f8f8f8;
+            background-attachment: fixed;
+            color: #333;
+        }
+
+        h1 {
+            color: #ff6b81;
+            text-shadow: 2px 2px 0 #fff, 
+                         2px -2px 0 #fff, 
+                         -2px 2px 0 #fff, 
+                         -2px -2px 0 #fff; 
+        }
+
+        p {
+            font-style: italic;
+        }
+
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .food-item {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 10px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .food-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        select, input[type="number"] {
+            width: 120px;
+            box-sizing: border-box;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #ff6b81;
+        }
+
+        .large-button {
+            font-size: larger;
+            padding: 10px 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+            background-color: #ff6b81;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .large-button:hover {
+            background-color: #ff4757;
+        }
+
+        .payment-info {
+            margin-top: 20px;
+        }
+
+        .payment-info input[type="number"] {
+            width: 150px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+        }
+
+        .payment-info input[type="number"]:focus {
+            outline: none;
+            border-color: #ff6b81;
+        }
+
+        .pay-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #ff6b81;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: 1px solid white;
+        }
+
+        .pay-button:hover {
+            background-color: #ff4757;
+        }
+
+        .add-item-button {
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .choice-container {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .choice-container > div {
+            margin-right: 20px;
+        }
+
+        .extra-choice {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the canteen! Here's our street foods menu</h1>
+    <p><strong>Prices are shown below. <em>Click finalize order button once you're sure with your orders.</em></strong></p>
+
+    <ul>
+        <li>Burger - 60 pesos</li>
+        <li>Fries - 50 pesos</li>
+        <li>Fishball - 20 pesos</li>
+        <li>Kikiam - 25 pesos</li>
+    </ul>
+    <button onclick="addFoodItem()" class="large-button">Add a food item</button><br><br>   
+
+    <label for="food">Choice</label><br><br>
+    <select id="food">
+        <option value="burger">Burger</option>
+        <option value="fries">Fries</option>
+        <option value="fishball">Fishball</option>
+        <option value="kikiam">Kikiam</option>
+    </select><br><br>
+    
+    <label for="quantity">Quantity</label><br><br>
+    <input type="number" id="quantity" min="1"><br><br>
+
+    
+    <div id="foodItems"></div>
+
+    <button class="large-button" onclick='finalizeOrder()'>Finalize order</button><br><br>
+
+    <div class="payment-info">
+        Cash: <input type="number" id="cash">
+        <button class="pay-button" onclick='processPayment()'>Pay!</button>
+    </div>
+
+    <p id="paymentStatus"></p>
+ 
+    <script>
+        let order = 0;
+        let totalOrderAmount = 0;
+
+        function addFoodItem() {
+            const foodItemsDiv = document.getElementById('foodItems');
+
+            const newFoodItemDiv = document.createElement('div');
+            newFoodItemDiv.classList.add('food-item');
+            order++;
+            newFoodItemDiv.innerHTML = `
+                <label for="food${order}">Extra Choice ${order}</label><br><br>
+                <select id="food${order}">
+                    <option value="burger">Burger</option>
+                    <option value="fries">Fries</option>
+                    <option value="fishball">Fishball</option>
+                    <option value="kikiam">Kikiam</option>
+                </select><br><br>
+                <label for="quantity${order}">Quantity</label><br><br>
+                <input type="number" id="quantity${order}" min="1"><br><br>
+            `;
+
+            foodItemsDiv.appendChild(newFoodItemDiv);
+        }
+
+        function finalizeOrder() {
+            const total = calculateTotal();
+            totalOrderAmount = total;
+            alert("Order is finalized! Total amount: " + total + " pesos");
+        }
+
+        function processPayment() {
+            const cash = document.getElementById('cash').value;
+            const change = cash - totalOrderAmount;
+            alert("Thanks for your order! Total change: " + change + " pesos");
+        }
+
+        function calculateTotal() {
+            let total = 0;
+
+            const foodItemsDiv = document.getElementById('foodItems');
+            const foodItemDivs = foodItemsDiv.querySelectorAll('.food-item');
+
+            foodItemDivs.forEach(foodItemDiv => {
+                const food = foodItemDiv.querySelector('select').value;
+                const quantity = parseInt(foodItemDiv.querySelector('input').value);
+
+                switch (food) {
+                    case 'burger':
+                        total += 60 * quantity;
+                        break;
+                    case 'fries':
+                        total += 50 * quantity;
+                        break;
+                    case 'fishball':
+                        total += 20 * quantity;
+                        break;
+                    case 'kikiam':
+                        total += 25 * quantity;
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+          
+            const existingFood = document.getElementById('food').value;
+            const existingQuantity = parseInt(document.getElementById('quantity').value);
+
+            switch (existingFood) {
+                case 'burger':
+                    total += 60 * existingQuantity;
+                    break;
+                case 'fries':
+                    total += 50 * existingQuantity;
+                    break;
+                case 'fishball':
+                    total += 20 * existingQuantity;
+                    break;
+                case 'kikiam':
+                    total += 25 * existingQuantity;
+                    break;
+                default:
+                    break;
+            }
+
+            return total;
+        }
+    </script>
+</body>
+</html>
